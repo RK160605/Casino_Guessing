@@ -79,34 +79,61 @@ public:
         rename("temp.txt", "players.txt");
     }
 
-    void playGame() {
-        char choice;
-        do {
-            int guess, bet;
-            int number = rand() % 10 + 1;
+void playGame() {
+    char choice;
 
-            cout << YELLOW << "💰 Current balance: " << balance << RESET << endl;
-            cout << CYAN << "Enter your guess (1 to 10): " << RESET;
-            cin >> guess;
-            cout << CYAN << "Enter your bet amount: " << RESET;
-            cin >> bet;
+    do {
+        if (balance <= 0) {
+            cout << RED << "❌ You don't have enough balance to play.\n" << RESET;
+            cout << YELLOW << "💰 Please recharge your account to continue.\n" << RESET;
+            return;  // Exit playGame()
+        }
 
-            if (bet > balance) {
-                cout << RED << "❌ You don't have enough balance!\n" << RESET;
-            } else if (guess == number) {
-                cout << GREEN << "🎉 Congratulations! You guessed the correct number.\n" << RESET;
-                balance += bet;
+        int guess, bet;
+        int number = rand() % 10 + 1;
+
+        cout << YELLOW << "Current balance: " << balance << endl << RESET;
+        cout << CYAN << "Enter your guess (1 to 10): " << RESET;
+        cin >> guess;
+        cout << CYAN << "Enter your bet amount: " << RESET;
+        cin >> bet;
+
+        if (bet > balance) {
+            cout << RED << "❌ You don't have enough balance for this bet!\n" << RESET;
+        } else if (guess == number) {
+            cout << GREEN << "🎉 Congratulations! You guessed the correct number.\n" << RESET;
+            balance += bet;
+        } else {
+            cout << RED << "😢 Wrong guess. The number was " << number << ".\n" << RESET;
+            balance -= bet;
+        }
+
+        updateBalance();
+
+        if (balance <= 0) {
+            cout << RED << "\n❌ Your balance is now 0. You can no longer play.\n" << RESET;
+            cout << CYAN << "Would you like to recharge your account? (y/n): " << RESET;
+            char rechargeChoice;
+            cin >> rechargeChoice;
+
+            if (rechargeChoice == 'y' || rechargeChoice == 'Y') {
+                int addAmount;
+                cout << CYAN << "Enter amount to add to your balance: " << RESET;
+                cin >> addAmount;
+                balance += addAmount;
+                updateBalance();
+                cout << GREEN << "✅ Recharge successful! Your new balance is " << balance << "\n" << RESET;
             } else {
-                cout << RED << "😢 Wrong guess. The number was " << number << ".\n" << RESET;
-                balance -= bet;
+                cout << RED << "👋 Exiting game due to insufficient balance.\n" << RESET;
+                return;
             }
+        }
 
-            updateBalance();
+        cout << CYAN << "\nDo you want to play again? (y/n): " << RESET;
+        cin >> choice;
+    } while (choice == 'y' || choice == 'Y');
+}
 
-            cout << MAGENTA << "Do you want to play again? (y/n): " << RESET;
-            cin >> choice;
-        } while (choice == 'y' || choice == 'Y');
-    }
 };
 
 int main() {
